@@ -13209,12 +13209,13 @@ end
 -- MAIN GUI PANEL (THE CONTROL HUB CONTAINER)
 --------------------------------------------------------------------------------
 local OpenSize = UDim2.new(0, 800, 0, 300)
-local OpenPos = UDim2.new(0.5, -400, 1, -320)
+local OpenPos = UDim2.new(0.5, 0, 1, -20)
 local CloseSize = UDim2.new(0, 800, 0, 0)
-local ClosePos = UDim2.new(0.5, -400, 1, -20)
+local ClosePos = UDim2.new(0.5, 0, 1, -20)
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
+MainFrame.AnchorPoint = Vector2.new(0.5, 1)
 MainFrame.Size = CloseSize
 MainFrame.Position = ClosePos
 MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Plain solid black
@@ -15209,7 +15210,7 @@ local function updateStrings()
     
     -- Anchors at top of the screen (rounded for sharp alignment)
     local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
-    local scaleFactor = shouldScale and 0.55 or 1
+    local scaleFactor = shouldScale and 0.45 or 1
     local leftAnchor = Vector2.new(round(screenSize.X / 2 - 180 * scaleFactor), 0)
     local rightAnchor = Vector2.new(round(screenSize.X / 2 + 180 * scaleFactor), 0)
     
@@ -16594,14 +16595,15 @@ local function applyMobileScale(instance)
             if not uiScale then
                 uiScale = Instance.new("UIScale")
                 uiScale.Name = "MobileScale"
-                uiScale.Scale = 0.55
+                uiScale.Scale = 0.45
                 uiScale.Parent = instance
             else
-                uiScale.Scale = 0.55
+                uiScale.Scale = 0.45
             end
             
-            -- Center the main panel on mobile so it doesn't open off-screen
-            if instance.Name == "MainFrame" and instance.AnchorPoint ~= Vector2.new(0.5, 0.5) then
+            -- Center the custom command panels on mobile so they don't open off-screen
+            -- (We skip the main hub panel which is parented directly to ScreenGui and anchored at bottom-center)
+            if instance.Name == "MainFrame" and instance.Parent ~= ScreenGui and instance.AnchorPoint ~= Vector2.new(0.5, 0.5) then
                 instance.AnchorPoint = Vector2.new(0.5, 0.5)
                 instance.Position = UDim2.new(0.5, 0, 0.5, 0)
             end
@@ -16611,8 +16613,8 @@ local function applyMobileScale(instance)
                 uiScale:Destroy()
             end
             
-            -- Revert AnchorPoint and position if it was previously set by mobile scale
-            if instance.Name == "MainFrame" and instance.AnchorPoint == Vector2.new(0.5, 0.5) then
+            -- Revert AnchorPoint and position of custom command panels if they were centered by mobile scale
+            if instance.Name == "MainFrame" and instance.Parent ~= ScreenGui and instance.AnchorPoint == Vector2.new(0.5, 0.5) then
                 instance.AnchorPoint = Vector2.new(0, 0)
                 instance.Position = UDim2.new(0.5, -instance.Size.X.Offset / 2, 0.4, -instance.Size.Y.Offset / 2)
             end
