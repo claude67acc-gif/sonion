@@ -15513,8 +15513,8 @@ local function updateStrings()
     -- Anchors at top of the screen (rounded for sharp alignment)
     local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
     local scaleFactor = shouldScale and 0.45 or 1
-    local barWidth = 480 * scaleFactor
-    local barHeight = 46 * scaleFactor
+    local barWidth = CommandBarFrame.Size.X.Offset * scaleFactor
+    local barHeight = CommandBarFrame.Size.Y.Offset * scaleFactor
     
     local leftAnchor = Vector2.new(round(screenSize.X / 2 - 180 * scaleFactor), 0)
     local rightAnchor = Vector2.new(round(screenSize.X / 2 + 180 * scaleFactor), 0)
@@ -15564,8 +15564,8 @@ RunService.RenderStepped:Connect(function()
         local screenSize = getScreenSize()
         local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
         local scaleFactor = shouldScale and 0.45 or 1
-        local barWidth = 480 * scaleFactor
-        local barHeight = 46 * scaleFactor
+        local barWidth = CommandBarFrame.Size.X.Offset * scaleFactor
+        local barHeight = CommandBarFrame.Size.Y.Offset * scaleFactor
         
         local minX = barWidth / 2
         local maxX = screenSize.X - barWidth / 2
@@ -16778,7 +16778,7 @@ local function updateSuggestions()
     local screenSize = getScreenSize()
     local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
     local scaleFactor = shouldScale and 0.45 or 1
-    local barWidth = 480 * scaleFactor
+    local barWidth = CommandBarFrame.Size.X.Offset * scaleFactor
     
     local shownCount = math.min(6, #matches)
     SuggestionsFrame.Size = UDim2.new(0, barWidth, 0, (shownCount * 32) + 12)
@@ -16986,35 +16986,40 @@ end)
 --------------------------------------------------------------------------------
 -- INITIALIZATION COMPLETE
 --------------------------------------------------------------------------------
-if isMobile then
-    local ToggleGui = Instance.new("ScreenGui")
-    ToggleGui.Name = "XnoctisToggleGui"
-    ToggleGui.ResetOnSpawn = false
-    ToggleGui.IgnoreGuiInset = true
-    ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ToggleGui.Parent = UIContainer
-    
-    local ToggleButton = Instance.new("ImageButton")
-    ToggleButton.Name = "ToggleButton"
-    ToggleButton.Size = UDim2.new(0, 44, 0, 44)
-    ToggleButton.Position = UDim2.new(0.02, 0, 0.15, 0)
-    ToggleButton.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-    ToggleButton.BackgroundTransparency = 0
-    ToggleButton.BorderSizePixel = 0
-    ToggleButton.Image = "rbxassetid://95873225919618"
-    ToggleButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
-    ToggleButton.ZIndex = 100
-    ToggleButton.Parent = ToggleGui
-    
-    local ToggleCorner = Instance.new("UICorner")
-    ToggleCorner.CornerRadius = UDim.new(0, 10)
-    ToggleCorner.Parent = ToggleButton
-    
-    sharedMakeDraggable(ToggleButton, ToggleButton)
-    
-    ToggleButton.MouseButton1Click:Connect(function()
-        ScreenGui.Enabled = not ScreenGui.Enabled
-    end)
+local function setupMobileButton()
+    local screenSize = ScreenGui.AbsoluteSize
+    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
+    if shouldScale then
+        local ToggleGui = Instance.new("ScreenGui")
+        ToggleGui.Name = "XnoctisToggleGui"
+        ToggleGui.ResetOnSpawn = false
+        ToggleGui.IgnoreGuiInset = true
+        ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        ToggleGui.Parent = ScreenGui.Parent or PlayerGui
+        
+        local ToggleButton = Instance.new("ImageButton")
+        ToggleButton.Name = "ToggleButton"
+        ToggleButton.Size = UDim2.new(0, 44, 0, 44)
+        ToggleButton.Position = UDim2.new(0.02, 0, 0.15, 0)
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+        ToggleButton.BackgroundTransparency = 0
+        ToggleButton.BorderSizePixel = 0
+        ToggleButton.Image = "rbxassetid://95873225919618"
+        ToggleButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
+        ToggleButton.ZIndex = 100
+        ToggleButton.Parent = ToggleGui
+        
+        local ToggleCorner = Instance.new("UICorner")
+        ToggleCorner.CornerRadius = UDim.new(0, 10)
+        ToggleCorner.Parent = ToggleButton
+        
+        sharedMakeDraggable(ToggleButton, ToggleButton)
+        
+        ToggleButton.MouseButton1Click:Connect(function()
+            ScreenGui.Enabled = not ScreenGui.Enabled
+        end)
+    end
 end
+setupMobileButton()
 
 _G.ShowNotification("Xnoctis Control Hub", "UI Loaded! Press Right Control (RCtrl) to toggle panel.", 5)
