@@ -15208,7 +15208,8 @@ local function updateStrings()
     local screenSize = getScreenSize()
     
     -- Anchors at top of the screen (rounded for sharp alignment)
-    local scaleFactor = isMobile and 0.55 or 1
+    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
+    local scaleFactor = shouldScale and 0.55 or 1
     local leftAnchor = Vector2.new(round(screenSize.X / 2 - 180 * scaleFactor), 0)
     local rightAnchor = Vector2.new(round(screenSize.X / 2 + 180 * scaleFactor), 0)
     
@@ -16577,40 +16578,63 @@ end)() -- Ends the IIFE scope for PILL COMMAND BAR
 --------------------------------------------------------------------------------
 -- MOBILE SCREEN AUTO-SCALING SYSTEM
 --------------------------------------------------------------------------------
-if isMobile then
-    local function applyMobileScale(instance)
-        if instance:IsA("Frame") and (
-            instance.Name == "CommandBarFrame" or 
-            instance.Name == "MainFrame" or 
-            instance.Name == "SuggestionsFrame" or 
-            instance.Name == "AttachHubDropdown"
-        ) then
-            if not instance:FindFirstChild("MobileScale") then
-                local uiScale = Instance.new("UIScale")
+local function applyMobileScale(instance)
+    if instance:IsA("Frame") and (
+        instance.Name == "CommandBarFrame" or 
+        instance.Name == "MainFrame" or 
+        instance.Name == "SuggestionsFrame" or 
+        instance.Name == "AttachHubDropdown"
+    ) then
+        local screenSize = ScreenGui.AbsoluteSize
+        local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
+        
+        if shouldScale then
+            local uiScale = instance:FindFirstChild("MobileScale")
+            if not uiScale then
+                uiScale = Instance.new("UIScale")
                 uiScale.Name = "MobileScale"
-                uiScale.Scale = 0.55 -- Scale down to 55% on mobile
+                uiScale.Scale = 0.55
                 uiScale.Parent = instance
+            else
+                uiScale.Scale = 0.55
+            end
+        else
+            local uiScale = instance:FindFirstChild("MobileScale")
+            if uiScale then
+                uiScale:Destroy()
             end
         end
     end
-    
-    local function watchContainer(container)
-        if not container then return end
-        for _, desc in ipairs(container:GetDescendants()) do
-            pcall(applyMobileScale, desc)
-        end
-        container.DescendantAdded:Connect(function(desc)
-            pcall(applyMobileScale, desc)
-        end)
+end
+
+local function watchContainer(container)
+    if not container then return end
+    for _, desc in ipairs(container:GetDescendants()) do
+        pcall(applyMobileScale, desc)
     end
-    
-    task.spawn(function()
-        watchContainer(UIContainer)
-        if UIContainer ~= PlayerGui then
-            watchContainer(PlayerGui)
-        end
+    container.DescendantAdded:Connect(function(desc)
+        pcall(applyMobileScale, desc)
     end)
 end
+
+task.spawn(function()
+    watchContainer(UIContainer)
+    if UIContainer ~= PlayerGui then
+        watchContainer(PlayerGui)
+    end
+    
+    -- Dynamically update scaling when screen size changes (supports emulators and screen rotation)
+    ScreenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+        for _, desc in ipairs(UIContainer:GetDescendants()) do
+            pcall(applyMobileScale, desc)
+        end
+        if UIContainer ~= PlayerGui then
+            for _, desc in ipairs(PlayerGui:GetDescendants()) do
+                pcall(applyMobileScale, desc)
+            end
+        end
+    end)
+end)
 
 --------------------------------------------------------------------------------
 -- INITIALIZATION COMPLETE
