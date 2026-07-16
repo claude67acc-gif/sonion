@@ -15534,14 +15534,14 @@ local function updateStrings()
     
     -- Dynamically position dropdown frames perfectly flat below the command bar (ignores rotation of command bar)
     if SuggestionsFrame and SuggestionsFrame.Parent then
-        SuggestionsFrame.Position = UDim2.new(0, currentPos.X, 0, currentPos.Y + barHeight / 2 + 6)
-        SuggestionsFrame.Size = UDim2.new(0, 480, 0, SuggestionsFrame.Size.Y.Offset)
+        SuggestionsFrame.Position = UDim2.new(0, currentPos.X - barWidth / 2, 0, currentPos.Y + barHeight / 2 + 6)
+        SuggestionsFrame.Size = UDim2.new(0, barWidth, 0, SuggestionsFrame.Size.Y.Offset)
         SuggestionsFrame.Rotation = 0
     end
     
     if AttachHubDropdown and AttachHubDropdown.Parent and AttachHubHeight then
-        AttachHubDropdown.Position = UDim2.new(0, currentPos.X, 0, currentPos.Y + barHeight / 2 + 6)
-        AttachHubDropdown.Size = UDim2.new(0, 480, 0, AttachHubHeight.Value)
+        AttachHubDropdown.Position = UDim2.new(0, currentPos.X - barWidth / 2, 0, currentPos.Y + barHeight / 2 + 6)
+        AttachHubDropdown.Size = UDim2.new(0, barWidth, 0, AttachHubHeight.Value)
         AttachHubDropdown.Rotation = 0
     end
 end
@@ -15675,7 +15675,6 @@ PersonButton.Parent = CommandBarFrame
 -- Attach Hub Dropdown UI (Xnoctis Matching Styling)
 AttachHubDropdown = Instance.new("Frame")
 AttachHubDropdown.Name = "AttachHubDropdown"
-AttachHubDropdown.AnchorPoint = Vector2.new(0.5, 0)
 AttachHubDropdown.Size = UDim2.new(0, 480, 0, 0) -- Starts closed
 AttachHubDropdown.Position = UDim2.new(0, 0, 1, 6)
 AttachHubDropdown.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -16490,7 +16489,6 @@ end)
 -- Autocomplete Suggestions Dropdown
 SuggestionsFrame = Instance.new("ScrollingFrame")
 SuggestionsFrame.Name = "SuggestionsFrame"
-SuggestionsFrame.AnchorPoint = Vector2.new(0.5, 0)
 SuggestionsFrame.Size = UDim2.new(0, 480, 0, 0)
 SuggestionsFrame.Position = UDim2.new(0, 0, 1, 6)
 SuggestionsFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Pure Black
@@ -16777,8 +16775,13 @@ local function updateSuggestions()
         end)
     end
     
+    local screenSize = getScreenSize()
+    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
+    local scaleFactor = shouldScale and 0.45 or 1
+    local barWidth = 480 * scaleFactor
+    
     local shownCount = math.min(6, #matches)
-    SuggestionsFrame.Size = UDim2.new(0, CommandBarFrame.Size.X.Offset, 0, (shownCount * 32) + 12)
+    SuggestionsFrame.Size = UDim2.new(0, barWidth, 0, (shownCount * 32) + 12)
     SuggestionsFrame.CanvasSize = UDim2.new(0, 0, 0, (#matches * 32) + 12)
     SuggestionsFrame.Visible = true
 end
@@ -16942,11 +16945,9 @@ local function applyMobileScale(instance)
 end
 
 local function trackFrame(instance)
-    if (instance:IsA("Frame") or instance:IsA("ScrollingFrame")) and (
+    if instance:IsA("Frame") and (
         instance.Name == "CommandBarFrame" or 
-        instance.Name == "MainFrame" or 
-        instance.Name == "SuggestionsFrame" or 
-        instance.Name == "AttachHubDropdown"
+        instance.Name == "MainFrame"
     ) then
         TrackedFrames[instance] = true
         pcall(applyMobileScale, instance)
@@ -16985,4 +16986,35 @@ end)
 --------------------------------------------------------------------------------
 -- INITIALIZATION COMPLETE
 --------------------------------------------------------------------------------
+if isMobile then
+    local ToggleGui = Instance.new("ScreenGui")
+    ToggleGui.Name = "XnoctisToggleGui"
+    ToggleGui.ResetOnSpawn = false
+    ToggleGui.IgnoreGuiInset = true
+    ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ToggleGui.Parent = UIContainer
+    
+    local ToggleButton = Instance.new("ImageButton")
+    ToggleButton.Name = "ToggleButton"
+    ToggleButton.Size = UDim2.new(0, 44, 0, 44)
+    ToggleButton.Position = UDim2.new(0.02, 0, 0.15, 0)
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+    ToggleButton.BackgroundTransparency = 0
+    ToggleButton.BorderSizePixel = 0
+    ToggleButton.Image = "rbxassetid://95873225919618"
+    ToggleButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.ZIndex = 100
+    ToggleButton.Parent = ToggleGui
+    
+    local ToggleCorner = Instance.new("UICorner")
+    ToggleCorner.CornerRadius = UDim.new(0, 10)
+    ToggleCorner.Parent = ToggleButton
+    
+    sharedMakeDraggable(ToggleButton, ToggleButton)
+    
+    ToggleButton.MouseButton1Click:Connect(function()
+        ScreenGui.Enabled = not ScreenGui.Enabled
+    end)
+end
+
 _G.ShowNotification("Xnoctis Control Hub", "UI Loaded! Press Right Control (RCtrl) to toggle panel.", 5)
