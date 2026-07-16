@@ -25,7 +25,7 @@ local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+local isMobile = UserInputService.TouchEnabled
 
 -- Determine Parent (CoreGui is preferred for exploits to protect UI from reset/detection)
 local UIContainer = nil
@@ -15208,7 +15208,7 @@ local function updateStrings()
     local screenSize = getScreenSize()
     
     -- Anchors at top of the screen (rounded for sharp alignment)
-    local scaleFactor = isMobile and 0.75 or 1
+    local scaleFactor = isMobile and 0.55 or 1
     local leftAnchor = Vector2.new(round(screenSize.X / 2 - 180 * scaleFactor), 0)
     local rightAnchor = Vector2.new(round(screenSize.X / 2 + 180 * scaleFactor), 0)
     
@@ -16588,7 +16588,7 @@ if isMobile then
             if not instance:FindFirstChild("MobileScale") then
                 local uiScale = Instance.new("UIScale")
                 uiScale.Name = "MobileScale"
-                uiScale.Scale = 0.75 -- Scale down to 75% on mobile
+                uiScale.Scale = 0.55 -- Scale down to 55% on mobile
                 uiScale.Parent = instance
             end
         end
