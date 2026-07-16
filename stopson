@@ -15248,7 +15248,8 @@ RunService.RenderStepped:Connect(function()
     
     local screenSize = getScreenSize()
     local restX = round(screenSize.X / 2)
-    local restY = round(screenSize.Y * 0.1)
+    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
+    local restY = round(screenSize.Y * (shouldScale and 0.18 or 0.1))
     
     if isDragging then
         local mousePos = UserInputService:GetMouseLocation()
@@ -16598,10 +16599,22 @@ local function applyMobileScale(instance)
             else
                 uiScale.Scale = 0.55
             end
+            
+            -- Center the main panel on mobile so it doesn't open off-screen
+            if instance.Name == "MainFrame" and instance.AnchorPoint ~= Vector2.new(0.5, 0.5) then
+                instance.AnchorPoint = Vector2.new(0.5, 0.5)
+                instance.Position = UDim2.new(0.5, 0, 0.5, 0)
+            end
         else
             local uiScale = instance:FindFirstChild("MobileScale")
             if uiScale then
                 uiScale:Destroy()
+            end
+            
+            -- Revert AnchorPoint and position if it was previously set by mobile scale
+            if instance.Name == "MainFrame" and instance.AnchorPoint == Vector2.new(0.5, 0.5) then
+                instance.AnchorPoint = Vector2.new(0, 0)
+                instance.Position = UDim2.new(0.5, -instance.Size.X.Offset / 2, 0.4, -instance.Size.Y.Offset / 2)
             end
         end
     end
