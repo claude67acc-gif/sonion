@@ -15518,8 +15518,8 @@ local function updateStrings()
     local screenSize = getScreenSize()
     
     -- Anchors at top of the screen (rounded for sharp alignment)
-    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
-    local scaleFactor = shouldScale and 0.45 or 1
+    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 800) or (screenSize.X > 0 and screenSize.X < 1200)
+    local scaleFactor = shouldScale and 0.65 or 1
     local barWidth = CommandBarFrame.Size.X.Offset * scaleFactor
     local barHeight = CommandBarFrame.Size.Y.Offset * scaleFactor
     
@@ -15568,9 +15568,8 @@ RunService.RenderStepped:Connect(function()
         local mousePos = UserInputService:GetMouseLocation()
         local targetPos = mousePos - dragOffset
         
-        local screenSize = getScreenSize()
-        local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
-        local scaleFactor = shouldScale and 0.45 or 1
+        local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 800) or (screenSize.X > 0 and screenSize.X < 1200)
+        local scaleFactor = shouldScale and 0.65 or 1
         local barWidth = CommandBarFrame.Size.X.Offset * scaleFactor
         local barHeight = CommandBarFrame.Size.Y.Offset * scaleFactor
         
@@ -16783,8 +16782,8 @@ local function updateSuggestions()
     end
     
     local screenSize = getScreenSize()
-    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
-    local scaleFactor = shouldScale and 0.45 or 1
+    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 800) or (screenSize.X > 0 and screenSize.X < 1200)
+    local scaleFactor = shouldScale and 0.65 or 1
     local barWidth = CommandBarFrame.Size.X.Offset * scaleFactor
     
     local shownCount = math.min(6, #matches)
@@ -16918,17 +16917,17 @@ local TrackedFrames = setmetatable({}, {__mode = "k"})
 local function applyMobileScale(instance)
     if not instance or not instance.Parent then return end
     local screenSize = ScreenGui.AbsoluteSize
-    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
+    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 800) or (screenSize.X > 0 and screenSize.X < 1200)
     
     if shouldScale then
         local uiScale = instance:FindFirstChild("MobileScale")
         if not uiScale then
             uiScale = Instance.new("UIScale")
             uiScale.Name = "MobileScale"
-            uiScale.Scale = 0.45
+            uiScale.Scale = 0.65
             uiScale.Parent = instance
         else
-            uiScale.Scale = 0.45
+            uiScale.Scale = 0.65
         end
         
         -- Center the custom command panels on mobile so they don't open off-screen
@@ -16964,7 +16963,7 @@ end
 local MobileToggleGui = nil
 local function updateMobileToggleButton()
     local screenSize = ScreenGui.AbsoluteSize
-    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 600) or (screenSize.X > 0 and screenSize.X < 1100)
+    local shouldScale = isMobile or (screenSize.Y > 0 and screenSize.Y < 800) or (screenSize.X > 0 and screenSize.X < 1200)
     
     if shouldScale then
         if not MobileToggleGui then
@@ -16973,7 +16972,7 @@ local function updateMobileToggleButton()
             MobileToggleGui.ResetOnSpawn = false
             MobileToggleGui.IgnoreGuiInset = true
             MobileToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-            MobileToggleGui.Parent = ScreenGui.Parent or PlayerGui
+            MobileToggleGui.Parent = PlayerGui
             
             local ToggleButton = Instance.new("ImageButton")
             ToggleButton.Name = "ToggleButton"
@@ -16982,7 +16981,7 @@ local function updateMobileToggleButton()
             ToggleButton.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
             ToggleButton.BackgroundTransparency = 0
             ToggleButton.BorderSizePixel = 0
-            ToggleButton.Image = "rbxassetid://95873225919618"
+            ToggleButton.Image = "http://www.roblox.com/asset/?id=95873225919618"
             ToggleButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
             ToggleButton.ZIndex = 100
             ToggleButton.Parent = MobileToggleGui
